@@ -1,3 +1,5 @@
+'use strict';
+
 const express     = require('express');
 const bodyParser  = require('body-parser');
 const cors        = require('cors');
@@ -9,13 +11,15 @@ const apiRoutes = require('./routes/api.js');
 let app = express();
 
 
-app.use(cors()); 
+app.use('/public', express.static(process.cwd() + '/public'));
 
+app.use(cors()); 
 
 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
+app.use(express.static(__dirname+'public/uploads/'))
 
 //Index page (static HTML)
 app.route('/')
