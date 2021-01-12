@@ -2,9 +2,13 @@
 
 const express     = require('express');
 const bodyParser  = require('body-parser');
+const path = require('path')
+const fs = require("fs");
+const rimraf = require('rimraf')
 const cors        = require('cors');
 require('dotenv').config();
 require("./db-connections")
+
 
 const apiRoutes = require('./routes/api.js');
 
@@ -38,6 +42,36 @@ app.use(function(req, res, next) {
       .type('text')
       .send('Not Found');
   });
+
+
+  
+  /**************************************
+  *  
+  *       REMOVE FILES IN DIRECTORY
+  *    
+  ***************************************/
+  // const uploadsDir = __dirname + '/public/uploads'
+  
+  // fs.readdir(uploadsDir, (err, files) => {
+  //   files.forEach((file, index) => {
+  //     fs.stat(path.join(uploadsDir, file), (err, stat) => {
+  //       let endTime, now;
+  //       if(err) {
+  //         return console.error(err)
+  //       }
+  //       now = new Date().getTime()
+  //       endTime = new Date(stat.ctime).getTime() + 15000
+  //       if (now > endTime) {
+  //         return rimraf(path.join(uploadsDir, file), (err) => {
+  //           if (err) {
+  //             return console.error(err)
+  //           }
+  //           console.log("successfully deleted")
+  //         })
+  //       }
+  //     })
+  //   })
+  // })
 
 
 //Start our server and tests!

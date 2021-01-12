@@ -13,8 +13,12 @@ const UserModel = require("../models").User;
 const multer = require("multer");
 const { v4: uuidv4 } = require("uuid");
 let path = require("path");
-const fs = require("fs");
 
+/**************************************
+ *
+ *       USE MULTER TO UPLOAD IMAGES
+ *
+ ***************************************/
 const storage = multer.diskStorage({
   destination: "public/uploads/",
   filename: function (req, file, cb) {
@@ -36,6 +40,11 @@ const fileFilter = (req, file, cb) => {
 
 let upload = multer({ storage, fileFilter });
 
+/**************************************
+ *
+ *                API ROUTES
+ *
+ ***************************************/
 module.exports = function (app) {
   app.route("/api/users").get(function (req, res) {
     User.find({}, (err, data) => {
@@ -76,7 +85,7 @@ module.exports = function (app) {
   app.route("/delete").delete(upload.single("photo"), function (req, res) {
     //if successful response will be 'complete delete successful'
     //if successful rsponse will be 'complete delete successful'
-  
+
     User.deleteMany({}, (err, data) => {
       if (!err && data) {
         res.send("complete delete successful");
@@ -93,10 +102,60 @@ module.exports = function (app) {
   });
 
   app
-    .route("/api/books/:id")
-    .get(function (req, res) {})
+    .route("/users/:id")
+    .get(function (req, res) {
+      let usersid = req.params.id;
 
-    .post(function (req, res) {})
+      User.findById(usersid, (err, data) => {
+        if (!err && data) {
+          res.send(data);
+        } else if (!data) {
+          return res.send("no users were found");
+        }
+      });
+    })
 
-    .delete(function (req, res) {});
+    app
+    .route("/update/:id")
+    .post(function (req, res) {
+      let userid = req.params.id;
+      const name = req.body.name;
+      const birthdate = req.body.birthdate;
+      
+      //json res format same as .get
+
+      User.findById(userid, (error, data) => {
+        if (!data) {
+          return res.json("no user found");
+        } else {
+          if (!name) {
+            return res.send("missing required field name");
+          }else {
+            data.name.push(name)
+            data.birthdate.push(birthdate)
+            
+            data.save((err, data) => {
+              if (!err && data) {
+                res.json(data)
+              }
+            })
+          }
+        }
+      });
+    });
+
+  app
+  .route("/delete/:id")
+  .delete(function (req, res) {
+    let usersid = req.params.id;
+    //if successful response will be 'delete successful'
+
+    User.findByIdAndDelete(usersid, (err, data) => {
+      if (!err && data) {
+        res.send("delete successful");
+      } else if (!data) {
+        return res.send("no users found with that id");
+      }
+    });
+  });
 };
